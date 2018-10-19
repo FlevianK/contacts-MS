@@ -1,50 +1,61 @@
 <template>
-    <Vuetable
-      :data="contacts"
-      :fields="columns"
-      pagination-path=""
-    />
+  <div>
+    <div class="create">
+      <form @submit.prevent="addContact(name, phoneNumber)">
+        <div class="label">
+          <input v-model.trim="name" placeholder="Name" class="input">
+        </div>
+        <div class="label">
+          <input v-model.trim.number="phoneNumber" placeholder="Phone number" class="input">
+        </div>
+        <div class="label">
+          <button type="submit" class="submit">Add New Contact</button>
+        </div>
+      </form>
+    </div>
+    <div class="table">
+      <Vuetable
+        :data="contacts"
+        :fields="columns"
+        pagination-path=""
+      />
+    </div>
+  </div>
 </template>
 
 <script>
 import Vuetable from 'vuetable-2';
+import { dbInstance, db } from '../main'
 
 export default {
   name: 'ContentSection',
   data () {
     return {
       columns: ['name', 'phoneNumber'],
-      contacts: getData(),
-      options: {
-      headers: ['Name', 'phone Number']
-      }
+      contacts: [],
+      name: '',
+      phoneNumber: '',
+      createdAt: ''
     }
   },
   components: {
     Vuetable
+  },
+  firestore () {
+    return {
+      contacts: dbInstance.collection('contacts').orderBy('createdAt')
+    }
+  },
+  methods: { 
+    addContact (name, phoneNumber) {
+      const createdAt = new Date();
+      dbInstance.collection('contacts').add({
+        name,
+        phoneNumber,
+        createdAt
+      })
+    }
   }
-}
-
-function getData() {
-  return [{
-    phoneNumber: "058576856",
-    name: "Zimbabwe",
-    created_at: "2015-04-24T01:46:50.459583",
-    updated_at: "2015-04-24T01:46:50.459593",
-    id: 1
-  }, {
-    phoneNumber: "3756746745",
-    name: "Zambia",
-    created_at: "2015-04-24T01:46:50.457459",
-    updated_at: "2015-04-24T01:46:50.457468",
-    id: 2
-  }, {
-    phoneNumber: "4576745475",
-    name: "Yemen",
-    created_at: "2015-04-24T01:46:50.454731",
-    updated_at: "2015-04-24T01:46:50.454741",
-    id: 3
-  }]
 }
 
 </script>
@@ -53,4 +64,28 @@ function getData() {
   .hello {
   padding: 10px;
   }
+  .table {
+    padding: 5px;
+    width: 40%;
+    margin: 5px;
+  }
+  .create {
+    padding: 20px;
+    background-color: white;
+    width: 50%;
+    margin: 20px;
+    z-index: 9999;
+  }
+   .label {
+      padding: 10px;
+    }
+    .input {
+      padding: 5px;
+      width: 60%;
+    }
+    .submit {
+      background-color: blue;
+      color: white;
+      padding: 5px;
+    }
 </style>

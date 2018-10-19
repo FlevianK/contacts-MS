@@ -6,6 +6,7 @@
 </template>
 
 <script>
+
 import Header from './components/Header.vue'
 import ContentSection from './components/ContentSection.vue'
 
